@@ -73,7 +73,7 @@ void BattleScene::draw()
     auto r0 = battle_roles_[0];  //当前正在行动中的角色
     Engine::getInstance()->setRenderAssistTexture();
     Engine::getInstance()->fillColor({ 0, 0, 0, 255 }, 0, 0, render_center_x_ * 2, render_center_y_ * 2);
-#ifndef _DEBUG
+//#ifndef _DEBUG
     for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
     {
         for (int i = -view_width_region_; i <= view_width_region_; i++)
@@ -123,7 +123,7 @@ void BattleScene::draw()
             }
         }
     }
-#endif
+//#endif
     for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
     {
         for (int i = -view_width_region_; i <= view_width_region_; i++)

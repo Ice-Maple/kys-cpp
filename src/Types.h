@@ -205,6 +205,7 @@ struct SubMapInfoSave
     int EntranceX, EntranceY;
     int ExitX[3], ExitY[3];
     int JumpX, JumpY, JumpReturnX, JumpReturnY;
+	int UseBigPic;
 };
 
 //场景事件数据

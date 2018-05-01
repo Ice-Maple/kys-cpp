@@ -79,6 +79,7 @@ public:
 
     Texture* loadTexture(const std::string& path, int num);
     int getTextureGroupCount(const std::string& path);
+	void TextureManager::loadBigPic(const std::string& path, int picnum, int x, int y);
 private:
     void initialTextureGroup(const std::string& path, bool load_all = false);
     void loadTexture2(const std::string& path, int num, Texture* t);

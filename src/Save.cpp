@@ -6,6 +6,9 @@
 #include "PotConv.h"
 #include "others/libconvert.h"
 #include "Option.h"
+#include <direct.h>
+#include "Event.h"
+using namespace std;
 
 Save Save::save_;
 
@@ -61,11 +64,27 @@ bool Save::load(int num)
     auto rgrp = File::getIdxContent(filename_idx, filenamer, &offset_, &length_);
 
     memcpy(&InShip, rgrp + offset_[0], length_[0]);
+	cout << offset_[0] << endl;
+	cout << length_[0] << endl;
+
+
     File::readDataToVector(rgrp + offset_[1], length_[1], roles_mem_, sizeof(RoleSave));
     File::readDataToVector(rgrp + offset_[2], length_[2], items_mem_, sizeof(ItemSave));
     File::readDataToVector(rgrp + offset_[3], length_[3], submap_infos_mem_, sizeof(SubMapInfoSave));
     File::readDataToVector(rgrp + offset_[4], length_[4], magics_mem_, sizeof(MagicSave));
     File::readDataToVector(rgrp + offset_[5], length_[5], shops_mem_, sizeof(ShopSave));
+
+
+	cout << "ÏÔÊ¾´óÐ¡" << endl;
+	cout << sizeof(RoleSave) << endl;
+	cout << sizeof(ItemSave) << endl;
+	cout << sizeof(SubMapInfoSave) << endl;
+	cout << sizeof(MagicSave) << endl;
+	cout << sizeof(ShopSave) << endl;
+	char buf[80];
+	getcwd(buf, sizeof(buf));
+	printf("current working directory: %sn", buf);
+
 
     toPtrVector(roles_mem_, roles_);
     toPtrVector(items_mem_, items_);
@@ -114,6 +133,11 @@ bool Save::load(int num)
     }
 
     makeMaps();
+
+	cout << submap_infos_mem_[70].Name << endl;
+	cout << submap_infos_mem_[70].MainEntranceX1 << endl;
+	cout << submap_infos_mem_[70].MainEntranceY1 << endl;
+	cout << submap_infos_mem_[70].UseBigPic << endl;
 
     return true;
 }

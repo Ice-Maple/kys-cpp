@@ -6,6 +6,9 @@
 #include "Audio.h"
 #include "Random.h"
 #include "PotConv.h"
+#include "TextureManager.h"
+#include <iostream>
+using namespace std;
 
 SubScene::SubScene()
 {
@@ -45,105 +48,159 @@ void SubScene::draw()
 
     //以下画法存在争议
     //一整块地面
+//#ifndef _DEBUG
+	cout << "UseBigPic:" << submap_info_->UseBigPic << endl;
+	if (submap_info_->UseBigPic == 1)
+	{
+		auto p = getPositionOnRender(31, 31, view_x_, view_y_);
+		TextureManager::getInstance()->renderTexture("smap", 4127, p.x, p.y);
+		for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
+		{
+			for (int i = -view_width_region_; i <= view_width_region_; i++)
+			{
+				int ix = view_x_ + i + (sum / 2);
+				int iy = view_y_ - i + (sum - sum / 2);
+				auto p = getPositionOnRender(ix, iy, view_x_, view_y_);
+				p.x += x_;
+				p.y += y_;
+				if (!isOutLine(ix, iy))
+				{
+					int h = submap_info_->BuildingHeight(ix, iy);
+					int num = submap_info_->Earth(ix, iy) / 2;
+					//鼠标位置
+					if (ix == cursor_x_ && iy == cursor_y_)
+					{
+						TextureManager::getInstance()->renderTexture("mmap", 1, p.x, p.y - h, { 255, 255, 255, 255 }, 128);
+					}
+					//主角
+					if (ix == man_x_ && iy == man_y_)
+					{
+						//此处当主角的贴图为负值时，表示强制设置贴图号
+						if (force_man_pic_ < 0)
+						{
+							man_pic_ = calManPic();
+						}
+						else
+						{
+							man_pic_ = force_man_pic_;
+						}
+						TextureManager::getInstance()->renderTexture("smap", man_pic_, p.x, p.y - h);
+					}
+					//事件
+					auto event = submap_info_->Event(ix, iy);
+					if (event)
+					{
+						num = submap_info_->Event(ix, iy)->CurrentPic / 2;
+						//map[calBlockTurn(i1, i2, 2)] = s;
+						if (num > 0)
+						{
+							TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - h);
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{//int w = screen_center_x_ * 2;
+	//int h = screen_center_y_ * 2;
+	//获取的是中心位置，如贴图应减掉屏幕尺寸的一半
+	//auto p = getPositionOnWholeEarth(view_x_, view_y_);
+	//Engine::getInstance()->renderCopy(earth_texture_, { p.x - screen_center_x_, p.y - screen_center_y_, w, h }, { 0, 0, w, h }, 1);
+		for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
+		{
+			for (int i = -view_width_region_; i <= view_width_region_; i++)
+			{
+				int ix = view_x_ + i + (sum / 2);
+				int iy = view_y_ - i + (sum - sum / 2);
+				auto p = getPositionOnRender(ix, iy, view_x_, view_y_);
+				p.x += x_;
+				p.y += y_;
+				if (!isOutLine(ix, iy))
+				{
+					int h = submap_info_->BuildingHeight(ix, iy);
+					int num = submap_info_->Earth(ix, iy) / 2;
+					//无高度地面
+					if (num > 0 && h == 0)
+					{
+						TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y);
+						/*auto tex = TextureManager::getInstance()->loadTexture("smap", num);
+						//用大图画时的闪烁地面
+						if (tex->count > 1)
+						{
+							TextureManager::getInstance()->renderTexture(tex, p.x, p.y);
+						}*/
+					}
+				}
+			}
+		}
+		//#endif
+		for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
+		{
+			for (int i = -view_width_region_; i <= view_width_region_; i++)
+			{
+				int ix = view_x_ + i + (sum / 2);
+				int iy = view_y_ - i + (sum - sum / 2);
+				auto p = getPositionOnRender(ix, iy, view_x_, view_y_);
+				p.x += x_;
+				p.y += y_;
+				if (!isOutLine(ix, iy))
+				{
+					//有高度地面
+					int h = submap_info_->BuildingHeight(ix, iy);
+					int num = submap_info_->Earth(ix, iy) / 2;
 #ifndef _DEBUG
-    //auto p = getPositionOnWholeEarth(view_x_, view_y_);
-    //int w = screen_center_x_ * 2;
-    //int h = screen_center_y_ * 2;
-    //获取的是中心位置，如贴图应减掉屏幕尺寸的一半
-    //Engine::getInstance()->renderCopy(earth_texture_, { p.x - screen_center_x_, p.y - screen_center_y_, w, h }, { 0, 0, w, h }, 1);
-    for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
-    {
-        for (int i = -view_width_region_; i <= view_width_region_; i++)
-        {
-            int ix = view_x_ + i + (sum / 2);
-            int iy = view_y_ - i + (sum - sum / 2);
-            auto p = getPositionOnRender(ix, iy, view_x_, view_y_);
-            p.x += x_;
-            p.y += y_;
-            if (!isOutLine(ix, iy))
-            {
-                int h = submap_info_->BuildingHeight(ix, iy);
-                int num = submap_info_->Earth(ix, iy) / 2;
-                //无高度地面
-                if (num > 0 && h == 0)
-                {
-                    TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y);
-                    /*auto tex = TextureManager::getInstance()->loadTexture("smap", num);
-                    //用大图画时的闪烁地面
-                    if (tex->count > 1)
-                    {
-                        TextureManager::getInstance()->renderTexture(tex, p.x, p.y);
-                    }*/
-                }
-            }
-        }
-    }
+					if (num > 0 && h > 0)
+					{
+						TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y);
+					}
 #endif
-    for (int sum = -view_sum_region_; sum <= view_sum_region_ + 15; sum++)
-    {
-        for (int i = -view_width_region_; i <= view_width_region_; i++)
-        {
-            int ix = view_x_ + i + (sum / 2);
-            int iy = view_y_ - i + (sum - sum / 2);
-            auto p = getPositionOnRender(ix, iy, view_x_, view_y_);
-            p.x += x_;
-            p.y += y_;
-            if (!isOutLine(ix, iy))
-            {
-                //有高度地面
-                int h = submap_info_->BuildingHeight(ix, iy);
-                int num = submap_info_->Earth(ix, iy) / 2;
-#ifndef _DEBUG
-                if (num > 0 && h > 0)
-                {
-                    TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y);
-                }
-#endif
-                //鼠标位置
-                if (ix == cursor_x_ && iy == cursor_y_)
-                {
-                    TextureManager::getInstance()->renderTexture("mmap", 1, p.x, p.y - h, { 255, 255, 255, 255 }, 128);
-                }
-                //建筑和主角
-                num = submap_info_->Building(ix, iy) / 2;
-                if (num > 0)
-                {
-                    TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - h);
-                }
-                if (ix == man_x_ && iy == man_y_)
-                {
-                    //此处当主角的贴图为负值时，表示强制设置贴图号
-                    if (force_man_pic_ < 0)
-                    {
-                        man_pic_ = calManPic();
-                    }
-                    else
-                    {
-                        man_pic_ = force_man_pic_;
-                    }
-                    TextureManager::getInstance()->renderTexture("smap", man_pic_, p.x, p.y - h);
-                }
-                //事件
-                auto event = submap_info_->Event(ix, iy);
-                if (event)
-                {
-                    num = submap_info_->Event(ix, iy)->CurrentPic / 2;
-                    //map[calBlockTurn(i1, i2, 2)] = s;
-                    if (num > 0)
-                    {
-                        TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - h);
-                    }
-                }
-                //装饰
-                num = submap_info_->Decoration(ix, iy) / 2;
-                if (num > 0)
-                {
-                    TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - submap_info_->DecorationHeight(ix, iy));
-                }
-            }
-            //k++;
-        }
-    }
+					//鼠标位置
+					if (ix == cursor_x_ && iy == cursor_y_)
+					{
+						TextureManager::getInstance()->renderTexture("mmap", 1, p.x, p.y - h, { 255, 255, 255, 255 }, 128);
+					}
+					//建筑和主角
+					num = submap_info_->Building(ix, iy) / 2;
+					if (num > 0)
+					{
+						TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - h);
+					}
+					if (ix == man_x_ && iy == man_y_)
+					{
+						//此处当主角的贴图为负值时，表示强制设置贴图号
+						if (force_man_pic_ < 0)
+						{
+							man_pic_ = calManPic();
+						}
+						else
+						{
+							man_pic_ = force_man_pic_;
+						}
+						TextureManager::getInstance()->renderTexture("smap", man_pic_, p.x, p.y - h);
+					}
+					//事件
+					auto event = submap_info_->Event(ix, iy);
+					if (event)
+					{
+						num = submap_info_->Event(ix, iy)->CurrentPic / 2;
+						//map[calBlockTurn(i1, i2, 2)] = s;
+						if (num > 0)
+						{
+							TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - h);
+						}
+					}
+					//装饰
+					num = submap_info_->Decoration(ix, iy) / 2;
+					if (num > 0)
+					{
+						TextureManager::getInstance()->renderTexture("smap", num, p.x, p.y - submap_info_->DecorationHeight(ix, iy));
+					}
+				}
+				//k++;
+			}
+		}
+	}
     Engine::getInstance()->renderAssistTextureToWindow();
 }
 

@@ -13,6 +13,8 @@
 #include <sys/stat.h>
 #endif
 
+using namespace std;
+
 File::File()
 {
 }
@@ -229,10 +231,12 @@ char* File::getIdxContent(std::string filename_idx, std::string filename_grp, st
     offset->resize(len / 4 + 1);
     length->resize(len / 4);
     offset->at(0) = 0;
+	cout << "输出Ridx" << endl;
     for (int i = 0; i < len / 4; i++)
     {
         (*offset)[i + 1] = Ridx[i];
         (*length)[i] = (*offset)[i + 1] - (*offset)[i];
+		cout << Ridx[i] << endl;
     }
     int total_length = offset->back();
     delete[] Ridx;

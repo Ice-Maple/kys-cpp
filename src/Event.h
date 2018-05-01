@@ -134,6 +134,10 @@ public:
     void clearTalkBox();
     void blank() {}
 
+	//
+	std::string GetRInfo(int page, int proNum, std::string Name);
+
+
 private:
     int x50[0x10000];
 public:

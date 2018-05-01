@@ -1088,6 +1088,34 @@ void Event::clearTalkBox()
     talk_box_down_->setContent("");
 }
 
+//std::string Event::GetRInfo(int page, int proNum, std::string Name)
+//{
+//	auto save = Save::getInstance();
+//	const int offset=[]
+//
+//	switch (page)
+//	{
+//	case 1:
+//		r = save->getRole(proNum);
+//		break;
+//	case 2:
+//		r = save->getItem(proNum);
+//		break;
+//	case 3:
+//		r = save->getMagic(proNum);
+//		break;
+//	case 4:
+//		r = save->getSubMapInfo(proNum);
+//		break;
+//	case 5:
+//		r = save->getShop(proNum);
+//		break;
+//	}
+//	char *p = (char *)r;
+//}
+
+
+
 //50扩展指令
 //虽然有一定程度的支持，但是这不表示推荐使用
 void Event::instruct_50e(int code, int e1, int e2, int e3, int e4, int e5, int e6, int* code_ptr)

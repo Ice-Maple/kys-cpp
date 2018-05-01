@@ -157,3 +157,15 @@ void TextureManager::loadTexture2(const std::string& path, int num, Texture* t)
         t->loaded = true;
     }
 }
+
+void TextureManager::loadBigPic(const std::string& path, int picnum, int x, int y)
+{
+	std::string p = path_ + path + "/" + std::to_string(picnum) + ".png";
+	printf("Load texture %s\n", p.c_str());
+	Texture* t = new Texture();
+	t->tex[0] = Engine::getInstance()->loadImage(p);
+	printf("Load：%s\n", std::to_string(t->tex[0]!=nullptr).c_str());
+	Engine::getInstance()->queryTexture(t->tex[0], &t->w, &t->h);
+	t->loaded = true;
+	renderTexture(t, x, y);
+}
